@@ -5,7 +5,9 @@ use Illuminate\Http\Request;
 use Src\Shared\Request\RequestId;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
+use Src\Shared\Request\RequestUpdateCart;
 use Src\App\Cart\Application\Find\FindUserCart;
+use Src\App\Cart\Application\Update\UpdateCart;
 use Src\App\Cart\Application\AddItem\AddItemToCart;
 use Src\App\Cart\Application\RemoveItem\RemoveItemFromCart;
 
@@ -13,11 +15,13 @@ class CartController {
     private FindUserCart $find_cart_service;
     private AddItemToCart $add_item_to_cart_service;
     private RemoveItemFromCart $remove_item_service;
+    private UpdateCart $update_cart_service;
     public function __construct(private readonly FindUserCart $findCartService, private readonly AddItemToCart $addItemToCartService, 
-    private readonly RemoveItemFromCart $removeItemService) {
+    private readonly RemoveItemFromCart $removeItemService, private readonly UpdateCart $updateCartService) {
         $this->find_cart_service = $findCartService;
         $this->add_item_to_cart_service = $addItemToCartService;
         $this->remove_item_service = $removeItemService;
+        $this->update_cart_service = $updateCartService;
     }
 
     public function find(string $user_id) {
@@ -76,6 +80,27 @@ class CartController {
             Log::error("CartController - remove_item - Exception: " . $e->getMessage());
             return response()->json([
                 'message' => 'Ha ocurrido un error al tratar de eliminar una linea del carrito.'
+            ], 500);
+        }
+
+    }
+
+    public function update(Request $request, string $cart_id) {
+        try {
+            $data = $request->all();
+            Log::info("CartController - update - PUT => " . $cart_id . " // " . json_encode($data));
+            $requestUpdateCart = new RequestUpdateCart($cart_id, $data);
+            if ($requestUpdateCart->validate()) {
+                $this->update_cart_service->update($requestUpdateCart);
+                return response()->json(["Cart updated."], 200);
+            }
+            return response()->json([
+                'message' => 'Hay un error al tratar de actualizar el carrito.'
+            ], 409);
+        } catch (\Exception $e) {
+            Log::error("CartController - update - Exception: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Ha ocurrido un error al tratar de actualizar el carrito.'
             ], 500);
         }
 
