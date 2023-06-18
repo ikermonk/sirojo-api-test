@@ -5,9 +5,11 @@ use Illuminate\Http\Request;
 use Src\Shared\Request\RequestId;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
+use Src\Shared\Request\RequestClearCart;
 use Src\Shared\Request\RequestUpdateCart;
 use Src\App\Cart\Application\Find\FindUserCart;
 use Src\App\Cart\Application\Update\UpdateCart;
+use Src\App\Cart\Application\ClearCart\ClearCart;
 use Src\App\Cart\Application\AddItem\AddItemToCart;
 use Src\App\Cart\Application\RemoveItem\RemoveItemFromCart;
 
@@ -16,12 +18,14 @@ class CartController {
     private AddItemToCart $add_item_to_cart_service;
     private RemoveItemFromCart $remove_item_service;
     private UpdateCart $update_cart_service;
+    private ClearCart $clear_cart_service;
     public function __construct(private readonly FindUserCart $findCartService, private readonly AddItemToCart $addItemToCartService, 
-    private readonly RemoveItemFromCart $removeItemService, private readonly UpdateCart $updateCartService) {
+    private readonly RemoveItemFromCart $removeItemService, private readonly UpdateCart $updateCartService, private readonly ClearCart $clearCartService) {
         $this->find_cart_service = $findCartService;
         $this->add_item_to_cart_service = $addItemToCartService;
         $this->remove_item_service = $removeItemService;
         $this->update_cart_service = $updateCartService;
+        $this->clear_cart_service = $clearCartService;
     }
 
     public function find(string $user_id) {
@@ -103,8 +107,27 @@ class CartController {
                 'message' => 'Ha ocurrido un error al tratar de actualizar el carrito.'
             ], 500);
         }
-
     }
+
+    public function clear(Request $request) {
+        try {
+            $data = $request->all();
+            Log::info("CartController - clear - DELETE => " . json_encode($data));
+            $requestClearCart = new RequestClearCart($data);
+            if ($requestClearCart->validate()) {
+                $this->clear_cart_service->clear($requestClearCart);
+                return response()->json(["Cart cleared."], 200);
+            }
+            return response()->json([
+                'message' => 'Hay un error al tratar de vaciar el carrito.'
+            ], 409);
+        } catch (\Exception $e) {
+            Log::error("CartController - clear - Exception: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Ha ocurrido un error al tratar de vaciar el carrito.'
+            ], 500);
+        }
+    }    
 
 }
 ?>
