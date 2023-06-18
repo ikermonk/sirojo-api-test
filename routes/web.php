@@ -21,4 +21,5 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api/v1/siroko'], function () use ($router) {
     $router->get('cart/{user_id}', '\Src\App\Cart\Presentation\Controllers\CartController@find');
     $router->post('cart-item', '\Src\App\Cart\Presentation\Controllers\CartController@add_item');
+    $router->delete('remove-item', '\Src\App\Cart\Presentation\Controllers\CartController@remove_item');
 });

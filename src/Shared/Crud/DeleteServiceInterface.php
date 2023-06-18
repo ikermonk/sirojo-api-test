@@ -2,6 +2,6 @@
 namespace Src\Shared\Crud;
 
 interface DeleteServiceInterface {
-    public function delete(string $id);
+    public function delete(string $id): void;
 }
 ?>

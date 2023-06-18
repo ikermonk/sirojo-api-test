@@ -6,9 +6,10 @@ use App\Services\CartItemsService;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Crud\AddServiceInterface;
 use Src\Shared\Crud\ListServiceInterface;
+use Src\Shared\Crud\DeleteServiceInterface;
 use Src\Shared\Crud\UpdateServiceInterface;
 
-class CartItemsRepository implements ListServiceInterface, AddServiceInterface, UpdateServiceInterface {
+class CartItemsRepository implements ListServiceInterface, AddServiceInterface, UpdateServiceInterface, DeleteServiceInterface {
 
     private CartItemsService $cart_items_eq_service;
     public function __construct(private readonly CartItemsService $cartItemsEqService) {
@@ -35,6 +36,10 @@ class CartItemsRepository implements ListServiceInterface, AddServiceInterface, 
 
     public function update(string $id, mixed $object): mixed {
         return $this->cart_items_eq_service->update($id, $object);
+    }
+
+    public function delete(string $id): void {
+        $this->cart_items_eq_service->delete($id);
     }
 
 }

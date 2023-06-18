@@ -4,9 +4,10 @@ namespace App\Services;
 use App\Models\CartItems;
 use Src\Shared\Crud\AddServiceInterface;
 use Src\Shared\Crud\ListServiceInterface;
+use Src\Shared\Crud\DeleteServiceInterface;
 use Src\Shared\Crud\UpdateServiceInterface;
 
-class CartItemsService implements ListServiceInterface, AddServiceInterface, UpdateServiceInterface {
+class CartItemsService implements ListServiceInterface, AddServiceInterface, UpdateServiceInterface, DeleteServiceInterface {
     public function list(string $id = null): array {
         return CartItems::where('id_cart', '=', $id)
         ->get()
@@ -26,5 +27,10 @@ class CartItemsService implements ListServiceInterface, AddServiceInterface, Upd
         $item->refresh();
         return $item;
     }
+
+    public function delete(string $id): void {
+        CartItems::find($id)->delete();
+    }
+
 }
 ?>
