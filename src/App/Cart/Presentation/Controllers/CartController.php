@@ -6,6 +6,7 @@ use Src\Shared\Request\RequestId;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
 use Src\Shared\Request\RequestClearCart;
+use Src\Shared\Request\RequestRemoveItem;
 use Src\Shared\Request\RequestUpdateCart;
 use Src\App\Cart\Application\Find\FindUserCart;
 use Src\App\Cart\Application\Update\UpdateCart;
@@ -71,7 +72,7 @@ class CartController {
         try {
             $data = $request->all();
             Log::info("CartController - remove_item - Delete => " . json_encode($data));
-            $requestRemoveItem = new RequestId($data["id_line"]);
+            $requestRemoveItem = new RequestRemoveItem($data["id_line"], $data["user_id"]);
             Log::info("CartController - remove_item - ID => " . $data["id_line"]);
             if ($requestRemoveItem->validate()) {
                 $this->remove_item_service->remove($requestRemoveItem);
@@ -93,7 +94,7 @@ class CartController {
         try {
             $data = $request->all();
             Log::info("CartController - update - PUT => " . $cart_id . " // " . json_encode($data));
-            $requestUpdateCart = new RequestUpdateCart($cart_id, $data);
+            $requestUpdateCart = new RequestUpdateCart($cart_id, $data["user_id"], $data["items"]);
             if ($requestUpdateCart->validate()) {
                 $this->update_cart_service->update($requestUpdateCart);
                 return response()->json(["Cart updated."], 200);
@@ -113,7 +114,7 @@ class CartController {
         try {
             $data = $request->all();
             Log::info("CartController - clear - DELETE => " . json_encode($data));
-            $requestClearCart = new RequestClearCart($data);
+            $requestClearCart = new RequestClearCart($data['user_id'], $data['items']);
             if ($requestClearCart->validate()) {
                 $this->clear_cart_service->clear($requestClearCart);
                 return response()->json(["Cart cleared."], 200);

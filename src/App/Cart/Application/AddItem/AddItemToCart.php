@@ -1,18 +1,22 @@
 <?php
 namespace Src\App\Cart\Application\AddItem;
 
-use App\Models\CartItems as CartItemEq;
 use Src\App\Cart\Domain\Cart;
+use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
+use App\Models\CartItems as CartItemEq;
+use Src\App\Cart\Infrastructure\Persitence\CartRepository;
 use Src\App\Cart\Infrastructure\Persitence\CartItemsRepository;
 
 class AddItemToCart {
+    private CartRepository $cart_repo;
     private CartItemsRepository $cart_items_repo;
-    public function __construct(private readonly CartItemsRepository $cartItemsRepo) {
+    public function __construct(private readonly CartRepository $cartRepo, private readonly CartItemsRepository $cartItemsRepo) {
+        $this->cart_repo = $cartRepo;
         $this->cart_items_repo = $cartItemsRepo;
     }
 
-    public function add(RequestAddItem $request): void {
+    public function add(RequestAddItem $request): Cart {
         $cart_items = $this->cart_items_repo->list($request->id_cart);
         $finded_item = $this->find_line($cart_items, $request->product_id);
         if(isset($finded_item)) {
@@ -26,6 +30,7 @@ class AddItemToCart {
             $item->quantity = $request->quantity;
             $this->cart_items_repo->add($item);
         }
+        return $this->cart_repo->get($request->user_id);
     }
 
     private function find_line(array $items, string $product_id): mixed {
