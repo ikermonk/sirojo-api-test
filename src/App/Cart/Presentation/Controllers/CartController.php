@@ -53,8 +53,8 @@ class CartController {
             Log::info("CartController - add_item - POST => " . json_encode($data));
             $requestAddItem = new RequestAddItem($data["id_cart"], $data["user_id"], $data["product_id"], $data["quantity"]);
             if ($requestAddItem->validate()) {
-                $this->add_item_to_cart_service->add($requestAddItem);
-                return response()->json(["Item added to cart"], 200);
+                $cart = $this->add_item_to_cart_service->add($requestAddItem);
+                return response()->json($cart);
             }
             return response()->json([
                 'message' => 'Hay un error al tratar de añadir un producto al carrito.'
@@ -75,8 +75,8 @@ class CartController {
             $requestRemoveItem = new RequestRemoveItem($data["id_line"], $data["user_id"]);
             Log::info("CartController - remove_item - ID => " . $data["id_line"]);
             if ($requestRemoveItem->validate()) {
-                $this->remove_item_service->remove($requestRemoveItem);
-                return response()->json(["Item removed to cart"], 200);
+                $cart = $this->remove_item_service->remove($requestRemoveItem);
+                return response()->json($cart);
             }
             return response()->json([
                 'message' => 'Hay un error al tratar de añadir un producto al carrito.'
@@ -96,8 +96,8 @@ class CartController {
             Log::info("CartController - update - PUT => " . $cart_id . " // " . json_encode($data));
             $requestUpdateCart = new RequestUpdateCart($cart_id, $data["user_id"], $data["items"]);
             if ($requestUpdateCart->validate()) {
-                $this->update_cart_service->update($requestUpdateCart);
-                return response()->json(["Cart updated."], 200);
+                $cart = $this->update_cart_service->update($requestUpdateCart);
+                return response()->json($cart);
             }
             return response()->json([
                 'message' => 'Hay un error al tratar de actualizar el carrito.'
@@ -116,8 +116,8 @@ class CartController {
             Log::info("CartController - clear - DELETE => " . json_encode($data));
             $requestClearCart = new RequestClearCart($data['user_id'], $data['items']);
             if ($requestClearCart->validate()) {
-                $this->clear_cart_service->clear($requestClearCart);
-                return response()->json(["Cart cleared."], 200);
+                $cart = $this->clear_cart_service->clear($requestClearCart);
+                return response()->json($cart);
             }
             return response()->json([
                 'message' => 'Hay un error al tratar de vaciar el carrito.'
