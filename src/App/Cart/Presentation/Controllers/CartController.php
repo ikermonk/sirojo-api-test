@@ -34,7 +34,7 @@ class CartController {
             if (isset($user_id) && $user_id !== "") {
                 $requestId = new RequestId($user_id);
                 $cart = $this->find_cart_service->find($requestId);
-                return response()->json($cart);
+                if (isset($cart)) return response()->json($cart);
             }
             return response()->json([
                 'message' => 'Hay un error al tratar de obtener el carrito.'
