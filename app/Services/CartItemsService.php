@@ -2,6 +2,8 @@
 namespace App\Services;
 
 use App\Models\CartItems;
+use App\Exceptions\UpdateException;
+use Illuminate\Support\Facades\Log;
 use Src\Shared\Crud\AddServiceInterface;
 use Src\Shared\Crud\ListServiceInterface;
 use Src\Shared\Crud\DeleteServiceInterface;
@@ -21,15 +23,18 @@ class CartItemsService implements ListServiceInterface, AddServiceInterface, Upd
     }
 
     public function update(string $id, mixed $object): mixed {
-        $item = CartItems::find($id);
-        $item->quantity = $object->quantity;
-        $item->save();
-        $item->refresh();
-        return $item;
+        $item = CartItems::where('uuid', "=", $id)->first();
+        if (isset($item) && $item !== "") {
+            $item->quantity = $object->quantity;
+            $item->save();
+            $item->refresh();
+            return $item;
+        }
+        throw new UpdateException();
     }
 
     public function delete(string $id): void {
-        CartItems::find($id)->delete();
+        CartItems::where('uuid', "=", $id)->delete();
     }
 
 }

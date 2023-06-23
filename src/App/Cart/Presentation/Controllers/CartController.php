@@ -29,11 +29,15 @@ class CartController {
         $this->clear_cart_service = $clearCartService;
     }
 
-    public function find(string $user_id) {
+    public function find(Request $request) {
         try {
-            if (isset($user_id) && $user_id !== "") {
-                $requestId = new RequestId($user_id);
+            $data = $request->all();
+            Log::info("CartController - find - Data => " . json_encode($data));
+            $requestId = new RequestId($data["id"], $data["by"]);
+            if ($requestId->validate()) {
+                Log::info("CartController - find - Request => " . $requestId->getId() . " // " . $requestId->getBy());
                 $cart = $this->find_cart_service->find($requestId);
+                Log::info("CartController - find - Cart => " . json_encode($cart));
                 if (isset($cart)) return response()->json($cart);
             }
             return response()->json([
@@ -53,7 +57,9 @@ class CartController {
             Log::info("CartController - add_item - POST => " . json_encode($data));
             $requestAddItem = new RequestAddItem($data["id_cart"], $data["user_id"], $data["product_id"], $data["quantity"]);
             if ($requestAddItem->validate()) {
+                Log::info("CartController - find - Request => " . json_encode($requestAddItem));
                 $cart = $this->add_item_to_cart_service->add($requestAddItem);
+                Log::info("CartController - find - Cart => " . json_encode($cart));
                 return response()->json($cart);
             }
             return response()->json([
@@ -102,6 +108,11 @@ class CartController {
             return response()->json([
                 'message' => 'Hay un error al tratar de actualizar el carrito.'
             ], 409);
+        } catch (\UpdateException $e) {
+            Log::error("CartController - update - UpdateException: " . $e->getMessage());
+            return response()->json([
+                'message' => 'No se ha localizado un Producto al actualizar el Carrito.'
+            ], 500);
         } catch (\Exception $e) {
             Log::error("CartController - update - Exception: " . $e->getMessage());
             return response()->json([

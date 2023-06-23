@@ -16,7 +16,7 @@ class RemoveItemFromCart {
 
     public function remove(RequestRemoveItem $request): Cart {
         $this->cart_items_repo->delete($request->id);
-        return $this->cart_repo->get($request->user_id);
+        return $this->cart_repo->get($request->user_id, "user");
     }
 
 }

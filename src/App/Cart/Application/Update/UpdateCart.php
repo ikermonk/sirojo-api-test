@@ -23,7 +23,7 @@ class UpdateCart {
             $item_obj->quantity = $item["quantity"];
             $this->cart_items_repo->update($item_obj->id, $item_obj);
         }
-        return $this->cart_repo->get($request->user_id);
+        return $this->cart_repo->get($request->user_id, "user");
     }
 }
 ?>

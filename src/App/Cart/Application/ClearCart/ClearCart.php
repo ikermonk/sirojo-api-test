@@ -18,7 +18,7 @@ class ClearCart {
         foreach ($request->items as $item) {
             $this->cart_items_repo->delete($item);
         }
-        return $this->cart_repo->get($request->user_id);
+        return $this->cart_repo->get($request->user_id, "user");
     }
 }
 ?>

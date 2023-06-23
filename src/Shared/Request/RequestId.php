@@ -5,18 +5,22 @@ use Illuminate\Support\Facades\Log;
 
 class RequestId {
     private string $id;
-    public function __construct(string $id) {
+    private string $by;
+    public function __construct(string $id, string $by = null) {
         $this->id = $id;
+        $this->by = $by;
     }
 
     public function getId(): string {
         return $this->id;
     }
 
-    public function validate(): bool {
-        Log::info("Data => " . $this->id);
-        return isset($this->id) && $this->id !== "" ;
+    public function getBy(): string {
+        return $this->by;
     }
 
+    public function validate(): bool {
+        return isset($this->id) && $this->id !== "";
+    }    
 }
 ?>

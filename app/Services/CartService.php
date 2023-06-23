@@ -8,9 +8,11 @@ use Src\Shared\Crud\GetServiceInterface;
 
 class CartService implements GetServiceInterface, AddServiceInterface {
 
-    public function get(string $user_id): mixed {
-        Log::info("CartService - get - UserID => ", [$user_id]);
-        return Cart::where('user_id', '=', $user_id)->first();
+    public function get(string $user_id, string $by = null): mixed {
+        if (isset($by) && $by !== "" && $by === "user") {
+            return Cart::where('user_id', '=', $user_id)->first();
+        }
+        return Cart::where('uuid', "=", $id)->first();
     }
 
     public function add(mixed $object): Cart {

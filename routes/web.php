@@ -19,7 +19,7 @@ $router->get('/', function () use ($router) {
 
 /* API */
 $router->group(['prefix' => 'api/v1/siroko'], function () use ($router) {
-    $router->get('cart/{user_id}', '\Src\App\Cart\Presentation\Controllers\CartController@find');
+    $router->get('cart', '\Src\App\Cart\Presentation\Controllers\CartController@find');
     $router->post('cart-item', '\Src\App\Cart\Presentation\Controllers\CartController@add_item');
     $router->put('cart/{cart_id}', '\Src\App\Cart\Presentation\Controllers\CartController@update');
     $router->delete('remove-item', '\Src\App\Cart\Presentation\Controllers\CartController@remove_item');

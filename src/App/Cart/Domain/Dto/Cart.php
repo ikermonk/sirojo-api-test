@@ -1,8 +1,5 @@
 <?php
-namespace Src\App\Cart\Domain;
-
-use Src\App\Cart\Domain\Cart;
-use Src\App\Cart\Domain\Dto\Cart as CartDto;
+namespace Src\App\Cart\Domain\Dto;
 
 class Cart {
     public string $id;
@@ -14,18 +11,6 @@ class Cart {
         $this->uuid = $uuid;
         $this->user_id = $user_id;
         $this->items = $items;
-    }
-
-    public function addItemToCart(): Cart {
-        
-    }
-
-    public function removeItemFromCart(): Cart {
-        
-    }
-
-    public function clearCart(): Cart {
-
     }
 }
 ?>

@@ -1,6 +1,7 @@
 <?php
 namespace Src\App\Cart\Application\AddItem;
 
+use Ramsey\Uuid\Uuid;
 use Src\App\Cart\Domain\Cart;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
@@ -25,12 +26,15 @@ class AddItemToCart {
             $this->cart_items_repo->update($item->id, $item);
         } else {
             $item = new CartItemEq();
+            $uuid = Uuid::uuid4();
+            $item_uuid = $uuid->toString();
             $item->id_cart = $request->id_cart;
+            $item->uuid = $item_uuid;
             $item->product_id = $request->product_id;
             $item->quantity = $request->quantity;
             $this->cart_items_repo->add($item);
         }
-        return $this->cart_repo->get($request->user_id);
+        return $this->cart_repo->get($request->user_id, "user");
     }
 
     private function find_line(array $items, string $product_id): mixed {
