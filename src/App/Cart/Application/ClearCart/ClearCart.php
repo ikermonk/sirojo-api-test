@@ -24,12 +24,10 @@ class ClearCart {
         Log::info("ClearCart - clear - Request => " . json_encode($request));
         $cart = $this->cart_repo->get($request->getId(), "");
         Log::info("ClearCart - clear - Cart => " . json_encode($cart));
-        //Update BBDD, removing all Cart Items:
-        foreach ($cart->items as $item) {
-            $this->cart_items_repo->delete($item->uuid);
-        }
         //Clear Cart:
         $cart->clearCart();
+        //Update BBDD, removing all Cart Items:
+        $this->cart_repo->delete($cart);
         Log::info("ClearCart - clear - Cart Cleared => " . json_encode($cart));
         //Return Cart:
         return $this->cart_transform->transform($cart);
