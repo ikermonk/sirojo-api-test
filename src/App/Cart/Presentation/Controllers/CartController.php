@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use Src\Shared\Request\RequestId;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
-use Src\Shared\Request\RequestClearCart;
 use Src\Shared\Request\RequestRemoveItem;
 use Src\Shared\Request\RequestUpdateCart;
 use Src\App\Cart\Application\Find\FindUserCart;
@@ -125,9 +124,10 @@ class CartController {
         try {
             $data = $request->all();
             Log::info("CartController - clear - DELETE => " . json_encode($data));
-            $requestClearCart = new RequestClearCart($data['user_id'], $data['items']);
-            if ($requestClearCart->validate()) {
-                $cart = $this->clear_cart_service->clear($requestClearCart);
+            $requestId = new RequestId($data["id_cart"], "");
+            Log::info("CartController - clear - DELETE - Request => " . json_encode($requestId));
+            if ($requestId->validate()) {
+                $cart = $this->clear_cart_service->clear($requestId);
                 return response()->json($cart);
             }
             return response()->json([

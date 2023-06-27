@@ -4,9 +4,9 @@ namespace Src\Shared\Request;
 use Illuminate\Support\Facades\Log;
 
 class RequestId {
-    private string $id;
-    private string $by;
-    public function __construct(string $id, string $by = null) {
+    public string $id;
+    public string $by;
+    public function __construct(string $id, string $by) {
         $this->id = $id;
         $this->by = $by;
     }

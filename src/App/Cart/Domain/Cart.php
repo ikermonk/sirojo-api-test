@@ -33,8 +33,8 @@ class Cart {
         
     }
 
-    public function clearCart(): Cart {
-
+    public function clearCart(): void {
+        $this->items = [];
     }
 
     private function find_item(string $product_id): bool {

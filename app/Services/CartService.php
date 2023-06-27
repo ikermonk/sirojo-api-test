@@ -9,9 +9,9 @@ use Src\Shared\Crud\UpdateServiceInterface;
 
 class CartService implements GetServiceInterface, AddServiceInterface, UpdateServiceInterface {
 
-    public function get(string $user_id, string $by = null): mixed {
+    public function get(string $id, string $by = null): mixed {
         if (isset($by) && $by !== "" && $by === "user") {
-            return Cart::where('user_id', '=', $user_id)->first();
+            return Cart::where('user_id', '=', $id)->first();
         }
         return Cart::where('uuid', "=", $id)->first();
     }

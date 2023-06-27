@@ -23,6 +23,7 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
     public function get(string $id, string $by = null): mixed {
         //Get Cart Info:
         $cart_eq = $this->cart_eq_service->get($id, $by);
+        Log::info("CartRepository - get - Cart EQ => " . json_encode($cart_eq));
         //If User not have a Cart, we create one.
         if (!isset($cart_eq)) {
             $uuid = Uuid::uuid4();
