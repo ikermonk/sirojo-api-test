@@ -28,7 +28,6 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
     public function get(string $id, string $by = null): mixed {
         //Get Cart Info:
         $cart_eq = $this->cart_eq_service->get($id, $by);
-        Log::info("CartRepository - get - Cart EQ => " . json_encode($cart_eq));
         //If User not have a Cart, we create one.
         if (!isset($cart_eq)) {
             $uuid = Uuid::uuid4();
@@ -69,18 +68,14 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
     }    
 
     public function update(string $id, mixed $object): mixed {
-        Log::info("CartRepository - update - Object => " . json_encode($object));
         //Update Cart:
         $cart_eq = new CartEq();
         $cart_eq->id = $object->id;
         $cart_eq->uuid = $id;
         $cart_eq->user_id = $object->user_id;
         $cart_eq->updated_at = Carbon::now();
-        Log::info("CartRepository - update - Cart EQ => " . json_encode($cart_eq));
         $cart_eq_new = $this->cart_eq_service->update($object->uuid, $cart_eq);
-        Log::info("CartRepository - update - Cart Updated => " . json_encode($cart_eq_new));
         //Update Items:
-        Log::info("CartRepository - update - Items => " . json_encode($object->items));
         if (isset($object->items) && is_array($object->items) && sizeof($object->items) > 0) {
             foreach ($object->items as $item) {
                 $item_eq = new CartItems();
