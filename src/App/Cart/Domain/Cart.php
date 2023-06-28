@@ -29,8 +29,13 @@ class Cart {
         }
     }
 
-    public function removeItemFromCart(): Cart {
-        
+    public function removeItemFromCart(string $id_item): void {
+        foreach($this->items as $i => $item) {
+            if($item->uuid === $id_item) {
+                unset($this->items[$i]);
+                break;
+            }
+        }
     }
 
     public function clearCart(): void {

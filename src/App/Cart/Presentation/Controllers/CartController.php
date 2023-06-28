@@ -76,9 +76,9 @@ class CartController {
     public function remove_item(Request $request) {
         try {
             $data = $request->all();
-            Log::info("CartController - remove_item - Delete => " . json_encode($data));
-            $requestRemoveItem = new RequestRemoveItem($data["id_line"], $data["user_id"]);
-            Log::info("CartController - remove_item - ID => " . $data["id_line"]);
+            Log::info("CartController - remove_item - Request => " . json_encode($data));
+            $requestRemoveItem = new RequestRemoveItem($data["id_line"], $data["id_cart"]);
+            Log::info("CartController - remove_item - Data => " . json_encode($requestRemoveItem));
             if ($requestRemoveItem->validate()) {
                 $cart = $this->remove_item_service->remove($requestRemoveItem);
                 return response()->json($cart);
