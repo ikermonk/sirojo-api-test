@@ -16,7 +16,11 @@ class FindUserCart {
     }
 
     public function find(RequestId $request): Cart {
+        //Get Cart:
+        Log::info("FindUserCart - find - Request => " . json_encode($request));
         $cart = $this->cart_repo->get($request->getId(), $request->getBy());
+        Log::info("FindUserCart - find - Cart => " . json_encode($cart));
+        //Return Cart DTO:
         return $this->cart_transform->transform($cart);
     }
 }
