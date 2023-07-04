@@ -57,7 +57,7 @@ class UpdateCartTest extends TestCase {
         //Tested Calss:
         $result = $updateCart->update($request);
         // Assert
-        $this->assertSame($cart2, $result);;
+        $this->assertSame($cart2, $result);
     }
 }
 ?>
