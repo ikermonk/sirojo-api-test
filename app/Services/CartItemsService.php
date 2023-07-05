@@ -22,15 +22,15 @@ class CartItemsService implements ListServiceInterface, AddServiceInterface, Upd
         return $object;
     }
 
-    public function update(string $id, mixed $object): mixed {
+    public function update(string $id, mixed $object): void {
         $item = CartItems::where('uuid', "=", $id)->first();
         if (isset($item) && $item !== "") {
             $item->quantity = $object->quantity;
             $item->save();
             $item->refresh();
-            return $item;
+        } else {
+            throw new UpdateException();
         }
-        throw new UpdateException();
     }
 
     public function delete(string $id): void {

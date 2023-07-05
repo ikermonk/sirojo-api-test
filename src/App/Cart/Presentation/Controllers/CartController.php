@@ -51,25 +51,18 @@ class CartController {
     }
 
     public function add_item(Request $request) {
-        try {
-            $data = $request->all();
-            Log::info("CartController - add_item - POST => " . json_encode($data));
-            $requestAddItem = new RequestAddItem($data["id_cart"], $data["user_id"], $data["product_id"], $data["quantity"]);
-            if ($requestAddItem->validate()) {
-                Log::info("CartController - find - Request => " . json_encode($requestAddItem));
-                $cart = $this->add_item_to_cart_service->add($requestAddItem);
-                Log::info("CartController - find - Cart => " . json_encode($cart));
-                return response()->json($cart);
-            }
-            return response()->json([
-                'message' => 'Hay un error al tratar de añadir un producto al carrito.'
-            ], 409);
-        } catch (\Exception $e) {
-            Log::error("CartController - add_item - Exception: " . $e->getMessage());
-            return response()->json([
-                'message' => 'Ha ocurrido un error al tratar de añadir una linea nueva al carrito.'
-            ], 500);
+        $data = $request->all();
+        Log::info("CartController - add_item - POST => " . json_encode($data));
+        $requestAddItem = new RequestAddItem($data["id_cart"], $data["user_id"], $data["product_id"], $data["quantity"]);
+        if ($requestAddItem->validate()) {
+            Log::info("CartController - find - Request => " . json_encode($requestAddItem));
+            $cart = $this->add_item_to_cart_service->add($requestAddItem);
+            Log::info("CartController - find - Cart => " . json_encode($cart));
+            return response()->json($cart);
         }
+        return response()->json([
+            'message' => 'Hay un error al tratar de añadir un producto al carrito.'
+        ], 409);
 
     }
 

@@ -12,17 +12,13 @@ use App\Services\CartItemsService;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Crud\GetServiceInterface;
 use Src\Shared\Crud\UpdateServiceInterface;
-use Src\App\Cart\Infrastructure\Persitence\CartItemsRepository;
 
 class CartRepository implements GetServiceInterface, UpdateServiceInterface {
     private CartService $cart_eq_service;
     private CartItemsService $cart_items_eq_service;
-    private CartItemsRepository $cart_items_repo;
-    public function __construct(private readonly CartService $cartEqService, private readonly CartItemsRepository $cartItemsRepo, 
-    private readonly CartItemsService $cartItemsEqService) {
+    public function __construct(private readonly CartService $cartEqService, private readonly CartItemsService $cartItemsEqService) {
         $this->cart_eq_service = $cartEqService;
         $this->cart_items_eq_service = $cartItemsEqService;
-        $this->cart_items_repo = $cartItemsRepo;
     }
     
     public function get(string $id, string $by = null): mixed {
@@ -38,8 +34,15 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
             $cart = new Cart($cart_eq["id"], $cart_eq["uuid"], $id, []);
         }
         //Get Items:
-        $items = $this->cart_items_repo->list($cart->uuid);
-        $cart->items = $items;
+        $items = $this->cart_items_eq_service->list($cart->uuid);
+        $cart_items = [];
+        if (isset($items) && is_array($items) && sizeof($items) > 0) {
+            foreach ($items as $item) {
+                $cart_item = new CartItem($item["id"], $item["uuid"], $item["id_cart"], $item["product_id"], $item["quantity"]);
+                array_push($cart_items, $cart_item);
+            }
+        }
+        $cart->items = $cart_items;
         return $cart;
     }
 
@@ -67,15 +70,18 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
         return $cart;
     }    
 
-    public function update(string $id, mixed $object): mixed {
+    public function update(string $id, mixed $object): void {
         //Update Cart:
+        Log::info("CartRepository - update - Params => " . $id . " // " . json_encode($object));
         $cart_eq = new CartEq();
         $cart_eq->id = $object->id;
         $cart_eq->uuid = $id;
         $cart_eq->user_id = $object->user_id;
         $cart_eq->updated_at = Carbon::now();
-        $cart_eq_new = $this->cart_eq_service->update($object->uuid, $cart_eq);
+        Log::info("CartRepository - update - Cart => " . json_encode($cart_eq));
+        $this->cart_eq_service->update($id, $cart_eq);
         //Update Items:
+        Log::info("CartRepository - update - Cart Items => " . json_encode($object->items));
         if (isset($object->items) && is_array($object->items) && sizeof($object->items) > 0) {
             foreach ($object->items as $item) {
                 $item_eq = new CartItems();
@@ -85,15 +91,14 @@ class CartRepository implements GetServiceInterface, UpdateServiceInterface {
                 $item_eq->product_id = $item->product_id;
                 $item_eq->quantity = $item->quantity;
                 if (isset($item->id) && $item->id !== "") {
-                    $item = $this->cart_items_repo->update($item->uuid, $item_eq);
+                    $item = $this->cart_items_eq_service->update($item->uuid, $item_eq);
                 } else {
                     $item_eq->created_at = Carbon::now();
                     $item_eq->updated_at = Carbon::now();
-                    $item = $this->cart_items_repo->add($item_eq);
+                    $item = $this->cart_items_eq_service->add($item_eq);
                 }
             }
         }
-        return $object;
     } 
 
     public function delete(Cart $cart): void {

@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Cart;
+use App\Exceptions\UpdateException;
 use Illuminate\Support\Facades\Log;
 use Src\Shared\Crud\AddServiceInterface;
 use Src\Shared\Crud\GetServiceInterface;
@@ -22,14 +23,18 @@ class CartService implements GetServiceInterface, AddServiceInterface, UpdateSer
         return $object;
     }
 
-    public function update(string $id, mixed $object): mixed {
-        $item = Cart::where('uuid', "=", $id)->first();
-        if (isset($item) && $item !== "") {
-            $item->save();
-            $item->refresh();
-            return $item;
+    public function update(string $id, mixed $object): void {
+        Log::info("CartService - update - Params => " . $id . " // " . json_encode($object));
+        $cart = Cart::where('uuid', "=", $id)->first();
+        Log::info("CartService - update - Cart => " . json_encode($cart));
+        if (isset($cart)) {
+            $cart->updated_at = $object->updated_at;
+            $cart->save();
+            $cart->refresh();
+            Log::info("CartService - update - Cart Updates => " . json_encode($cart));
+        } else {
+            throw new UpdateException();
         }
-        throw new UpdateException();
     }
 
 }

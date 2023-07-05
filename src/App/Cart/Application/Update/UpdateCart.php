@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestUpdateCart;
 use Src\App\Cart\Domain\Transform\CartTransform;
 use Src\App\Cart\Infrastructure\Persitence\CartRepository;
-use Src\App\Cart\Infrastructure\Persitence\CartItemsRepository;
 
 class UpdateCart {
     private CartRepository $cart_repo;

@@ -6,16 +6,12 @@ use Src\Shared\Request\RequestId;
 use Illuminate\Support\Facades\Log;
 use Src\App\Cart\Domain\Transform\CartTransform;
 use Src\App\Cart\Infrastructure\Persitence\CartRepository;
-use Src\App\Cart\Infrastructure\Persitence\CartItemsRepository;
 
 class ClearCart {
     private CartRepository $cart_repo;
-    private CartItemsRepository $cart_items_repo;
     private CartTransform $cart_transform;
-    public function __construct(private readonly CartRepository $cartRepo, private readonly CartItemsRepository $cartItemsRepo, 
-    private readonly CartTransform $cartTransform) {
+    public function __construct(private readonly CartRepository $cartRepo, private readonly CartTransform $cartTransform) {
         $this->cart_repo = $cartRepo;
-        $this->cart_items_repo = $cartItemsRepo;
         $this->cart_transform = $cartTransform;
     }
 
