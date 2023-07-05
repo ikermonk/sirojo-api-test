@@ -1,116 +1,109 @@
 <?php
 namespace Tests;
 
+use Ramsey\Uuid\Uuid;
 use Src\App\Cart\Domain\Cart;
 use Src\App\Cart\Domain\CartItem;
-use App\Models\CartItems;
-use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestAddItem;
+use Src\App\Cart\Domain\Dto\Cart as CartDto;
+use Src\App\Cart\Domain\Transform\CartTransform;
 use Src\App\Cart\Application\AddItem\AddItemToCart;
 use Src\App\Cart\Infrastructure\Persitence\CartRepository;
 
 class AddItemToCartTest extends TestCase {
-    public function testAddItemToCart_OkUpdateItem() {
+    public function testAddItemToCart_OkNewItem() {
         // Crear los objetos necesarios para la prueba
-        /*
-        //Dependencies:
-        $cartRepo = $this->createMock(CartRepository::class);
-        $cartItemsRepo = $this->createMock(CartItemsRepository::class);
+        //Request:
         $request = new RequestAddItem("1", "1", "3", 2);
-        $cart = new Cart("1", "1", []);
-        $items = [
-            new CartItem("1", "1", "1", 2),
-            new CartItem("2", "1", "3", 1)
-        ];
-        $cart->items = $items;
-        
-        $item_id = "2";
-        $item = $items[1];
-        
-        $cart2 = new Cart("1", "1", []);
-        $items2 = [
-            new CartItem("1", "1", "1", 2),
-            new CartItem("2", "1", "3", 3)
-        ];
-        $cart2->items = $items2;
-        //Mock
-        $cartItemsRepo->expects($this->once())
-            ->method('list')
-            ->with($request->id_cart)
-            ->willReturn($items);
-        $cartItemsRepo->expects($this->once())
-            ->method('update')
-            ->with($item_id, $item);
-        $cartRepo->expects($this->once())
+        //Item:
+        $item_uuid = Uuid::uuid4();
+        $item_uuid_id = $item_uuid->toString();
+        $item = new CartItem("1", $item_uuid_id, "1", "3", 2);
+        //Cart:
+        $cart_uuid = Uuid::uuid4();
+        $cart_uuid_id = $cart_uuid->toString();
+        $cart = new Cart("1", $cart_uuid_id, "1", []);
+        //Cart DTO
+        $cart_dto_uuid = Uuid::uuid4();
+        $cart_dto_uuid_id = $cart_dto_uuid->toString();
+        $cart_dto = new CartDto("1", $cart_dto_uuid_id, "1", []);
+        array_push($cart_dto->items, $item);
+        //Cart Added Item:
+        $cart_added_uuid = Uuid::uuid4();
+        $cart_added_uuid_id = $cart_uuid->toString();
+        $cart_added = new Cart("1", $cart_added_uuid_id, "1", []);
+        array_push($cart_added->items, $item);
+        //Dependencias:
+        $cartRepository = $this->createMock(CartRepository::class);
+        $cartTransform = $this->createMock(CartTransform::class);
+        //Mocks:
+        $cartRepository->expects($this->once())
             ->method('get')
-            ->with($request->user_id)
-            ->willReturn($cart2);
+            ->with($request->user_id, "user")
+            ->willReturn($cart);
+        $cartRepository->expects($this->once())
+            ->method('update')
+            ->with($cart_uuid_id, $cart);
+        $cartTransform->expects($this->once())
+            ->method('transform')
+            ->with($cart)
+            ->willReturn($cart_dto);
         //Tested Class:
-        $addItemToCart = new AddItemToCart($cartRepo, $cartItemsRepo);
-        $result = $addItemToCart->add($request);
+        $addItemToCart = new AddItemToCart($cartRepository, $cartTransform);
+        $new_cart = $addItemToCart->add($request);
         //Assert:
-        $this->assertInstanceOf(Cart::class, $result);
-        $this->assertEquals($cart2->id, $result->id);
-        $this->assertEquals($cart2->user_id, $result->user_id);
-        $this->assertEquals($cart2->items[0]->id, $result->items[0]->id);
-        $this->assertEquals($cart2->items[1]->id, $result->items[1]->id);
-        $this->assertEquals($result->items[1]->quantity, 3);
-        */
+        $this->assertInstanceOf(CartDto::class, $new_cart);
+        $this->assertSame($cart_dto, $new_cart);
     }
     
-    public function testAddItemToCart_OkNewItem() {
-        //Dependencies:
-        $cartRepo = $this->createMock(CartRepository::class);
-        $cartItemsRepo = $this->createMock(CartItemsRepository::class);
-        $request = new RequestAddItem("1", "1", "5", 2);
-        $cart = new Cart("1", "1", []);
-        $items = [
-            new CartItem("1", "1", "1", 2),
-            new CartItem("2", "1", "3", 1)
-        ];
-        $cart->items = $items;
-
-        $item = new CartItems();
-        $item->id_cart = $request->id_cart;
-        $item->product_id = $request->product_id;
-        $item->quantity = $request->quantity;
-
-        $item_eq = new CartItems();
-        $item_eq->id_cart = "1";
-        $item_eq->product_id = "5";
-        $item_eq->quantity = 2;
-
-        $cart2 = new Cart("1", "1", []);
-        $items2 = [
-            new CartItem("1", "1", "1", 2),
-            new CartItem("2", "1", "3", 1),
-            new CartItem("3", "1", "5", 2)
-        ];
-        $cart2->items = $items2;
-        //Mock
-        $cartItemsRepo->expects($this->once())
-            ->method('list')
-            ->with($request->id_cart)
-            ->willReturn($items);
-        $cartItemsRepo->expects($this->once())
-            ->method('add')
-            ->with($item_eq);
-        $cartRepo->expects($this->once())
+    public function testAddItemToCart_OkUpdateItem() {
+        // Crear los objetos necesarios para la prueba
+        //Request:
+        $request = new RequestAddItem("1", "1", "3", 2);
+        //Old Item:
+        $old_item_uuid = Uuid::uuid4();
+        $old_item_uuid_id = $old_item_uuid->toString();
+        $old_item = new CartItem("1", $old_item_uuid_id, "1", "3", 1);
+        //Cart:
+        $cart_uuid = Uuid::uuid4();
+        $cart_uuid_id = $cart_uuid->toString();
+        $cart = new Cart("1", $cart_uuid_id, "1", []);
+        array_push($cart->items, $old_item);
+        //New Item:
+        $new_item_uuid = Uuid::uuid4();
+        $new_item_uuid_id = $new_item_uuid->toString();
+        $new_item = new CartItem("1", $new_item_uuid_id, "1", "3", 3);
+        //Cart Added Item:
+        $cart_added_uuid = Uuid::uuid4();
+        $cart_added_uuid_id = $cart_uuid->toString();
+        $cart_added = new Cart("1", $cart_added_uuid_id, "1", []);
+        array_push($cart_added->items, $new_item);
+        //Cart DTO
+        $cart_dto_uuid = Uuid::uuid4();
+        $cart_dto_uuid_id = $cart_dto_uuid->toString();
+        $cart_dto = new CartDto("1", $cart_dto_uuid_id, "1", []);
+        array_push($cart_dto->items, $new_item);
+        //Dependencias:
+        $cartRepository = $this->createMock(CartRepository::class);
+        $cartTransform = $this->createMock(CartTransform::class);
+        //Mocks:
+        $cartRepository->expects($this->once())
             ->method('get')
-            ->with($request->user_id)
-            ->willReturn($cart2);
+            ->with($request->user_id, "user")
+            ->willReturn($cart);
+        $cartRepository->expects($this->once())
+            ->method('update')
+            ->with($cart_uuid_id, $cart);
+        $cartTransform->expects($this->once())
+            ->method('transform')
+            ->with($cart)
+            ->willReturn($cart_dto);
         //Tested Class:
-        $addItemToCart = new AddItemToCart($cartRepo, $cartItemsRepo);
-        $result = $addItemToCart->add($request);
+        $addItemToCart = new AddItemToCart($cartRepository, $cartTransform);
+        $new_cart = $addItemToCart->add($request);
         //Assert:
-        $this->assertInstanceOf(Cart::class, $result);
-        $this->assertEquals($cart2->id, $result->id);
-        $this->assertEquals($cart2->user_id, $result->user_id);
-        $this->assertEquals($cart2->items[0]->id, $result->items[0]->id);
-        $this->assertEquals($cart2->items[1]->id, $result->items[1]->id);
-        $this->assertEquals($cart2->items[2]->id, $result->items[2]->id);
-        $this->assertEquals($cart2->items[2]->product_id, $result->items[2]->product_id);
-        $this->assertEquals($cart2->items[2]->quantity, $result->items[2]->quantity);
+        $this->assertInstanceOf(CartDto::class, $new_cart);
+        $this->assertSame($cart_dto, $new_cart);
     }
 }
 ?>
