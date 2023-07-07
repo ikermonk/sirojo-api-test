@@ -1,6 +1,7 @@
 <?php
-namespace Tests;
+namespace Tests\Usecases;
 
+use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
 use Src\App\Cart\Domain\Cart;
 use Src\App\Cart\Domain\CartItem;

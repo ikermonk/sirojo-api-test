@@ -1,23 +1,30 @@
 <?php
-namespace Tests;
+namespace Tests\Usecases;
 
+use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
 use Src\App\Cart\Domain\Cart;
+use Src\App\Cart\Domain\CartItem;
 use Src\Shared\Request\RequestId;
 use Src\App\Cart\Domain\Dto\Cart as CartDto;
-use Src\App\Cart\Application\Find\FindUserCart;
 use Src\App\Cart\Domain\Transform\CartTransform;
+use Src\App\Cart\Application\ClearCart\ClearCart;
 use Src\App\Cart\Infrastructure\Persitence\CartRepository;
 
-class FindCartTest extends TestCase {
-    public function testFindCart_Ok() {
-        // Crear los objetos necesarios para la prueba
+class ClearCartTest extends TestCase {
+    public function testClearCart(): void {
+        // Crear los objetos necesarios para la prueba:
         //Request:
-        $requestId = new RequestId("1", "user");
+        $request = new RequestId("1", "");
+        //Item:
+        $item_uuid = Uuid::uuid4();
+        $item_uuid_id = $item_uuid->toString();
+        $item = new CartItem("1", $item_uuid_id, "1", "3", 2);
         //Cart:
         $cart_uuid = Uuid::uuid4();
         $cart_uuid_id = $cart_uuid->toString();
         $cart = new Cart("1", $cart_uuid_id, "1", []);
+        array_push($cart->items, $item);
         //Cart DTO
         $cart_dto_uuid = Uuid::uuid4();
         $cart_dto_uuid_id = $cart_dto_uuid->toString();
@@ -28,18 +35,21 @@ class FindCartTest extends TestCase {
         //Mocks:
         $cartRepository->expects($this->once())
             ->method('get')
-            ->with($requestId->getId(), $requestId->getBy())
+            ->with($request->getId(), "")
             ->willReturn($cart);
+        $cartRepository->expects($this->once())
+            ->method('delete')
+            ->with($cart);
         $cartTransform->expects($this->once())
             ->method('transform')
             ->with($cart)
             ->willReturn($cart_dto);
-        //Create Tested Class:
-        $findCartService = new FindUserCart($cartRepository, $cartTransform);
-        $new_cart = $findCartService->find($requestId);
+        //Tested Class:
+        $clearCart = new ClearCart($cartRepository, $cartTransform);
+        $result = $clearCart->clear($request);
         //Assert:
-        $this->assertInstanceOf(CartDto::class, $new_cart);
-        $this->assertSame($cart_dto, $new_cart);
+        $this->assertInstanceOf(CartDto::class, $result);
+        $this->assertSame($cart_dto, $result);
     }
 }
 ?>
