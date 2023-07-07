@@ -2,6 +2,7 @@
 namespace Src\App\Cart\Application\RemoveItem;
 
 use Src\App\Cart\Domain\Dto\Cart;
+use Illuminate\Support\Facades\Log;
 use Src\Shared\Request\RequestRemoveItem;
 use Src\App\Cart\Domain\Transform\CartTransform;
 use Src\App\Cart\Infrastructure\Persitence\CartRepository;
