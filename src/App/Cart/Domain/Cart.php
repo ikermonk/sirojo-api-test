@@ -39,9 +39,7 @@ class Cart {
 
     public function update(array $items): void {
         foreach ($items as $item) {
-            Log::info("Cart - update - Item to Update => " . json_encode($item));
             foreach ($this->items as $cart_item) {
-                Log::info("Cart - update - Cart Item => " . json_encode($cart_item));
                 if ($item["id"] === $cart_item->uuid) {
                     $cart_item->quantity = $item["quantity"];
                 }
